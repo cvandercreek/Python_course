@@ -1,0 +1,62 @@
+import math #Trig functions
+import numpy as np #Allows for linear algrebra calculations and matrices
+import cmath
+import matplotlib.pyplot as plt
+from scipy.integrate import quad
+import scipy
+import time 
+import functools
+import multiprocessing as mp
+from operator import add #Used to add two lists elementwise
+import Boundary_Layer_Models as BL
+import Turbulence_Model_3D as Model
+#from plotnine import *
+import cnumpy
+from scipy import optimize
+import timeit
+import pandas as pd
+
+def Phi_Goody(omega,u_star,tau_w,delta,U_inf,nu,**kwargs):
+    U_e = .99*U_inf
+    cf = 2*(u_star/U_inf)**2
+    Rt = (u_star*delta/nu)/math.sqrt(cf/2)
+    A = omega*delta/U_e
+    B = U_e/((tau_w**2)*delta)
+    #print("omega is: ",omega)
+    return (1/B)*((3*A**2)/((A**.75 + .6)**3.7 + ((1.1*Rt**(-.57))*A)**7))
+
+if __name__ == '__main__':
+  #Air properties
+  gamma = 1.4
+  T = 293.0 #temperature kelvin
+  molec_mass = 28.97
+  molar_gas = 8314.5
+  c_0 = math.sqrt(gamma*T*(molar_gas/molec_mass))
+  Press = 101325.0 
+  rho_0 = Press/((molar_gas/molec_mass)*T)
+  eta = 1.81e-5 #viscosity
+  nu = eta/rho_0 #kinematic viscosity
+
+  Pr = 0.71 #Prandtl number
+
+  U_inf = 30.0 #Freestream velocity
+  U_c = 0.65*U_inf #Convection Velocity
+  c_0 = 341.0 #Speed of sound
+  L = 0.01 #Width of cavity
+  x = L/2
+  x_0 = 0 #Reference position
+  sigma = 5
+  rho = 1.2221
+  u_star = 1.13 #Friction velocity 30 m/sec
+  delta = 36.5/1000 #Boundary Layer Thickness
+  tau_w = 1.52
+  delta_star = delta/8
+  nu = 15.05e-6
+
+
+  t = np.linspace(0.0,.1,1000) #Time seconds
+  freq = np.linspace(250,10000,100)
+  omega = freq*2*math.pi #Angular frequency
+  k = omega/c_0
+
+  phi_g = Phi_Goody(omega,u_star,tau_w,delta,U_inf,nu)
